@@ -1,6 +1,8 @@
 import javax.swing.*;
 import javax.swing.JPanel;
 import java.awt.event.ActionEvent;
+import java.io.IOException;
+import java.net.Socket;
 
 //This Class is the client part of the program
 
@@ -21,6 +23,15 @@ public class ChatRoom extends JFrame
         setResizable(false);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);//Could put function inside to turn off after doing some other stuff
         SetUpPanel();
+
+        try
+        {
+            ConnectToServer("127.0.0.1");
+        }
+        catch (IOException e)
+        {
+            System.out.println("Error Connecting to the Server... is it on?");
+        }
     }
 
     public void SetUpPanel()
@@ -40,6 +51,13 @@ public class ChatRoom extends JFrame
     {
         TA.append("You: "+TF.getText() + "\n");//Change this to get the sockets name and then change the "you part"
         TF.setText("");
+    }
+
+    Socket ClientSocket;
+
+    public void ConnectToServer(String ip) throws IOException
+    {
+        ClientSocket = new Socket(ip,25565);//change the port depending on the desired connection
     }
 
     public static void main(String args[])
