@@ -2,8 +2,12 @@ import javax.swing.*;
 import javax.swing.JPanel;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+//import java.io.PrintWriter;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
 
 //This Class can now run the Server and client
 
@@ -23,13 +27,19 @@ public class ChatRoom extends JFrame
     JButton JoinServer = new JButton("Join Server");
     JButton HostServer = new JButton("Host Server");
 
-    //Server Sockets
+    //Server Objects
     ServerSocket SSocket;
     Socket MainServerSocket;
+    PrintWriter out;
+    BufferedReader in;
 
     //Client Socket
-    Socket Client;
+    Socket ClientSocket;
 
+    public void run()
+    {
+        System.out.println("yep");
+    }
 
     public ChatRoom()
     {
@@ -39,6 +49,35 @@ public class ChatRoom extends JFrame
         setResizable(false);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);//Could put function inside to turn off after doing some other stuff
         SetUpPanel();
+
+    }
+
+    public void SetUpHostConnections()
+    {
+        try
+        {
+            out = new PrintWriter(MainServerSocket.getOutputStream(), true);
+            in = new BufferedReader(new InputStreamReader(MainServerSocket.getInputStream()));
+        }
+        catch (Exception e)
+        {
+            System.out.println("Error setting up connections");
+        }
+
+    }
+
+    public void SetUpJoiningConnections()
+    {
+        try
+        {
+            out = new PrintWriter(ClientSocket.getOutputStream(), true);
+            in = new BufferedReader(new InputStreamReader(ClientSocket.getInputStream()));
+        }
+        catch (Exception e)
+        {
+            System.out.println("Error setting up connections");
+        }
+
     }
 
     public void SetUpPanel()
@@ -69,9 +108,6 @@ public class ChatRoom extends JFrame
 
     public void JoinServerL(ActionEvent e)
     {
-        //TODO: Setup Socket to join the server
-        //TODO: Error check if the socket doesn't connect
-
         try
         {
             ConnectToServer(ServerIpTF.getText());
@@ -87,12 +123,13 @@ public class ChatRoom extends JFrame
         chat.setVisible(true);
         this.add(chat);
 
+            //SetUpConnections();
+            SetUpJoiningConnections();//Throws error in this call as the Joiner
+
     }
 
     public void HostServerL(ActionEvent e) //ActionEvent e allows to be used as action listener
     {
-
-
         try
         {
             SSocket = new ServerSocket(25565);
@@ -109,16 +146,22 @@ public class ChatRoom extends JFrame
         Menu.setVisible(false);
         chat.setVisible(true);
         this.add(chat);
-
+        if(MainServerSocket.isBound())
+        {
+            SetUpHostConnections();
+        }
     }
 
-    public void actionPerformed(ActionEvent e)
+    public void actionPerformed(ActionEvent e)//SendButton is clicked
     {
         TA.append("You: "+TF.getText() + "\n");//Change this to get the sockets name and then change the "you part"
         TF.setText("");
+        //Send the text to through the socket
+        out.println(TF.getText());
+
     }
 
-    Socket ClientSocket;
+
 
     public void ConnectToServer(String ip) throws IOException
     {
