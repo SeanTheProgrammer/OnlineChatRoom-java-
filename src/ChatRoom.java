@@ -64,6 +64,17 @@ public class ChatRoom extends JFrame
             System.out.println("Error setting up connections");
         }
 
+        System.out.println("Should be geting server message here \n\n");
+
+        try
+        {
+            TA.append(in.readLine());//This reads the line but it completely interups the program
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
     }
 
     public void SetUpJoiningConnections()
@@ -154,6 +165,10 @@ public class ChatRoom extends JFrame
 
     public void actionPerformed(ActionEvent e)//SendButton is clicked
     {
+        //TODO: Send through the socket
+        //TODO: Output the the screen the text (could me a method so can be used by both client and host)
+        out.println(TF.getText());
+
         TA.append("You: "+TF.getText() + "\n");//Change this to get the sockets name and then change the "you part"
         TF.setText("");
         //Send the text to through the socket
